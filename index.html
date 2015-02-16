@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+	<title>Block Chords</title>
+	<meta name="description" content="A randomly-generated mouse harp with randomly-generated key change functionality!">
+<meta name="keywords" content="interactive,music,tone.js,mouse,fun,chrome,javascript,js,abe,rubenstein,itp">
+<meta name="author" content="Abe Rubenstein">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta property="og:title"
+content="Block Chords" />
+<meta property="article:author"
+content="Abe Rubenstein" />
+<meta property="og:description" content="A randomly-generated mouse harp with randomly-generated key change functionality!" />
+<meta property="og:image"
+content="http://abe.sh/block-chords/blockchords.png" />
+
+	<style type="text/css">
+	
+	body {
+		margin:0;
+		background:#333;
+		color:white;
+		font-family:helvetica, arial;
+		font-size:10pt;
+	}
+
+	p {position:absolute;bottom:0; left:20px;z-index:2;}
+
+	a {color:gold;text-decoration:none;}
+
+	</style>
+	<script type="text/javascript" src="Tone.min.js"></script>
+</head>
+<body>
+
+	<p>Created by <a href="http://abe.sh/" target="_blank">Abe Rubenstein</a> using <a href="https://github.com/TONEnoTONE/Tone.js" target="_blank">Tone.js</a> for <em>Interactive Music</em> at <a href="http://itp.nyu.edu/itp" target="_blank">ITP</a></p>
+
+	<script type="text/javascript" language="javascript">
+
+	// random note between A2 and A4 (whole steps only)
+	function randomKey() {
+		return 110 * Math.pow(Math.pow(2, 1/12), Math.ceil(Math.random() * 15));
+	}
+
+	var keyBase = randomKey();
+
+	var synth = new Tone.PolySynth(16, Tone.MonoSynth);
+	synth.setVolume(-24); // default volume always makes my ears bleed
+	synth.toMaster();
+
+	var div = document.createElement('div');
+	div.style.height='100%';
+	div.style.lineHeight='0';
+	div.style.float='left';
+	div.style.overflow="hidden";
+	div.style.backgroundColor = '#333';
+
+	var sqPx = window.innerWidth / 48;
+
+	var randColorBase = Math.random() * 16777215;
+	if (randColorBase < 2236962) randColorBase = 2236962;
+	else if (randColorBase > 14540253) randColorBase = 14540253;
+
+	for (i = 0; i < window.innerWidth; i += sqPx ) {
+		for (j = 0; j < window.innerHeight; j += sqPx) {
+
+			var randColorStr = '#'+Math.floor(Math.random()*255+randColorBase).toString(16);
+
+			var block = document.createElement('div');
+			block.style.position='relative';
+			block.style.display='inline-block';
+			block.style.margin ='0px';
+			block.style.padding ='0px';
+			block.style.float= 'left';
+			block.style.width = sqPx + 'px';
+			block.style.height = sqPx + 'px';
+			block.style.zIndex = '1';
+
+			if (Math.random() > 0.97) {
+				block.style.zIndex = 5;
+				block.style.backgroundColor = 'white';
+				block.addEventListener('mouseover', function() {
+					if (this.style.background != 'transparent') {
+						keyBase = randomKey();
+						synth.triggerAttackRelease(4 * keyBase / 5 * 16, '4n', Tone.Time);
+					}
+					this.style.background = 'transparent';
+					this.style.zIndex = 1;
+				});
+			}
+			else {
+				block.style.zIndex = 5;
+				block.style.backgroundColor = randColorStr;
+				block.addEventListener('mouseover', function() {
+					if (this.style.background != 'transparent') {
+						// random from three octaves of major thirds
+						var r = Math.random();
+						if (r < 0.33) {
+							synth.triggerAttackRelease( 1/2*4*keyBase /5 * Math.ceil(Math.random() * 6), '4n', Tone.Time);
+						}
+						else if (r > 0.67) {
+							synth.triggerAttackRelease( 2*4*keyBase /5 * Math.ceil(Math.random() * 6), '4n', Tone.Time);
+						}
+						else {
+							synth.triggerAttackRelease( 4*keyBase /5 * Math.ceil(Math.random() * 6), '4n', Tone.Time);
+						}
+					}
+					this.style.background = 'transparent';
+					this.style.zIndex = 1;
+				});
+			}
+
+			div.appendChild(block);
+		}
+	}
+
+	document.body.appendChild(div);
+
+	</script>
+
+</body>
+</html>
